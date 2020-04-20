@@ -2,7 +2,9 @@ package br.com.codenation.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import br.com.codenation.model.OrderItem;
 import br.com.codenation.model.Product;
@@ -18,7 +20,11 @@ public class OrderServiceImpl implements OrderService {
 	 */
 	@Override
 	public Double calculateOrderValue(List<OrderItem> items) {
-		return null;
+		return items.stream()
+				.mapToDouble(orderItem -> productRepository.findById(orderItem.getProductId())
+						.map(product -> product.getIsSale() ? product.getValue() * 0.80 : product.getValue())
+						.orElse(0.00) * orderItem.getQuantity())
+				.sum();
 	}
 
 	/**
@@ -26,7 +32,11 @@ public class OrderServiceImpl implements OrderService {
 	 */
 	@Override
 	public Set<Product> findProductsById(List<Long> ids) {
-		return null;
+		return ids.stream()
+				.map(aLong -> productRepository.findById(aLong))
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.collect(Collectors.toSet());
 	}
 
 	/**
@@ -43,14 +53,6 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public Map<Boolean, List<Product>> groupProductsBySale(List<Long> productIds) {
 		return null;
-	}
-
-	public ProductRepository getProductRepository() {
-		return productRepository;
-	}
-
-	public void setProductRepository(ProductRepository productRepository) {
-		this.productRepository = productRepository;
 	}
 
 }
