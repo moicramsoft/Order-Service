@@ -54,7 +54,11 @@ public class OrderServiceImpl implements OrderService {
 	 */
 	@Override
 	public Map<Boolean, List<Product>> groupProductsBySale(List<Long> productIds) {
-		return null;
+		return productIds.stream()
+				.map(aLong -> productRepository.findById(aLong))
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.collect(Collectors.groupingBy(Product::getIsSale));
 	}
 
 }
